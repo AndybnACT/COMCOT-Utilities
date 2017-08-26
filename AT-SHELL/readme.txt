@@ -3,3 +3,4 @@ The script will check the format of inputs first. User must specify a computing 
 Later, the script will fork an 'at shell'. Inside the shell, ssh to the computing node, start the process, and redirect stdout and stderr to a file (default: JOB_DIARY.dat at the project directory) so that user can keep tracks of the process.
 If the user wants to stop the process after that, the user should ssh to the corresponding node and kill the process manually by oneself.
 An 'at' shell is widly used for system scheduling. its parent process is not belong to the user's shell session. Therefore, the process on 'at shell' will not affected by the user's session.
+*note: user should have the comcot executable file be compiled first
