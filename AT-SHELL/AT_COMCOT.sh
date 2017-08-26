@@ -1,7 +1,8 @@
 #!/bin/bash
-#STEP0:   ssh -p=== [User name]@140.115.===.===
-#STEP1:   cd to the comcot directory
-#STEP2:   ~/AT_COMCOT.sh [node number] [working directory]
+#STEP0:   scp -p=== [path of AT_COMCOT.sh] [User name]@140.115.===.===:~
+#STEP1:   ssh -p=== [User name]@140.115.===.===
+#STEP2:   cd to the comcot directory
+#STEP3:   ~/AT_COMCOT.sh [node number] [working directory]
 #========================   <MUST>  =====  <ELECTIVE> ====
 line="=================================================="
 COMPUTE_NODE='compute-0-'
