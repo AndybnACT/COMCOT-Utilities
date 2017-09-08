@@ -4,4 +4,4 @@ Descriptions of the content are shown below.
 # AT-SHELL
 A BASH script that makes system fork a 'at shell' to keep the process of simulation alive whether the user is still connected to the cluster 'wave' after the process has been started by the script.
 # XYZ-VIEWER
-C programs that read xyz files and show properties of it.
+C programs that read xyz files and show properties of them.
