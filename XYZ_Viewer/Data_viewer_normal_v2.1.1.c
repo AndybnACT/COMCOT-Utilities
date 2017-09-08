@@ -2,6 +2,10 @@
 #include<stdlib.h>
 #include<string.h>
 #include<math.h>
+// Compiling command: gcc -std=gnu99 -lm [source filename] -o [executable]
+// Usage            : [executable] [xyzfile1] [xyzfile2]...
+// The program read through the entire xyz file.
+// After the x, y, z data have been recorded, it displays the bounding box, height composition, and resolution of the file
 
 #define sealevel 0
 
@@ -47,8 +51,8 @@ int main(int argc, char const *argv[]) {
         xyzfile = fopen(argv[fileno],"rt");
         if (xyzfile) {
             //initialize for computing imformation
-            fscanf(xyzfile,"%lf %lf %lf\n",*xyz,*(xyz+1),*(xyz+2)); //for selecting max x y z
-            fscanf(xyzfile,"%lf %lf %lf\n",*(xyz)+1,*(xyz+1)+1,*(xyz+2)+1);//for selecting min x y z
+            fscanf(xyzfile,"%lf %lf %lf\n",*xyz,*(xyz+1),*(xyz+2)); //for recording max x y z
+            fscanf(xyzfile,"%lf %lf %lf\n",*(xyz)+1,*(xyz+1)+1,*(xyz+2)+1);//for recording min x y z
             //resolution
             for (int i = 0; i < 3; i++) {
                 res[i][0] = xyz[i][0];
@@ -130,7 +134,7 @@ int main(int argc, char const *argv[]) {
     return 0;
 }
 
-void HIST(float *value, char **key) {
+void HIST(float *value, char **key) { // results plotting
     int numsign = 0;
     for (int i = 9; i >= 0; i--) {
         printf("\t%s",*(key+i));

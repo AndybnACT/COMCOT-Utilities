@@ -2,10 +2,15 @@
 #include<stdlib.h>
 #include<string.h>
 #include<math.h>
+// Command for Compiling: gcc -std=gnu99 -lm [source filename] -o [executable]
+// Usage                : [executable] [xyzfile1] [xyzfile2]...
+// The program check the starting and ending lines to obtain the region of any given xyz files
+// resolution is recorded by seeking the first changing value of x and y  (first and second column)
+// Data within input files can be sperated either in comma (',') or spaces (' ')
+// The program produce an adjacency matrix indicating wehther a xyz file can be a submap of the others files after reading them
 
 #define sealevel 0
 #define BUFFER 80
-
 #define EARTH_R 6371
 #define PI_F 3.1415926535897932384626433832795f
 
@@ -73,11 +78,11 @@ int main(int argc, char const *argv[]) {
             seekEOL = '\0';
             while (seekEOL != '\n') {
                 fseek(xyzfile,-2,SEEK_CUR);
-                seekEOL = fgetc(xyzfile);//seek back to start of the last line
+                seekEOL = fgetc(xyzfile);//seek back to starting character of the last line
             }
             str2xyz(xyzfile,*(tmp+1)); // last line of the file
             for (int i = 0; i < 2; i++) {// x and y axis
-                if (tmp[0][i] >= tmp[1][i]) {
+                if (tmp[0][i] >= tmp[1][i]) { // stored in ascending order
                     xyz[0][i] = tmp[0][i];
                     xyz[1][i] = tmp[1][i];
                 }else{
@@ -88,11 +93,11 @@ int main(int argc, char const *argv[]) {
             rewind(xyzfile);
             // get resolution
             str2xyz(xyzfile,*res);
-            while (res[2][0]*res[2][1] == 0) {
+            while (res[2][0]*res[2][1] == 0) { // haven't been recorded
                 str2xyz(xyzfile,*(res+1));
-                for (int i = 0; i < 2; i++) {
+                for (int i = 0; i < 2; i++) { // x and y axis
                     delta = fabs(res[1][i] - res[0][i]);
-                    if (delta < res[2][i] || res[2][i] == 0.) {
+                    if (res[2][i] == 0. && delta != 0.) {// first changing value
                         res[2][i] = delta;
                     }
                 }
@@ -115,11 +120,11 @@ int main(int argc, char const *argv[]) {
             // order of size of file
             index = 0;
             if (size/1e3 > 1) {
-                index = 1;
+                index = 1;  // KB
                 if (size/1e6 > 1) {
-                    index = 2;
+                    index = 2; // MB
                     if (size/1e9 > 1) {
-                        index = 3;
+                        index = 3; // GB
                     }
                 }
             }
@@ -144,7 +149,7 @@ int main(int argc, char const *argv[]) {
             insert(MAPs+1,*(tmpmap+1));
         }else{
             printf("Could not find %s\n",argv[fileno]);
-            return 2;
+            continue;
         }
         fclose(xyzfile);
     }
@@ -156,6 +161,7 @@ int main(int argc, char const *argv[]) {
 }
 
 void str2xyz(FILE *infile, double *outarr){
+    // convert string of the xyz file into a float array
     static int SWITCH=0;
     char instr[BUFFER];
     long file_loc;
@@ -195,6 +201,7 @@ void insert(MAPpointer *maps,MAPpointer compare ){
     tmp->compare = compare->compare;
     tmp->NEXT = NULL;
 
+    // insertion sort
     if (!(*maps)){//empty list
         *maps = tmp;
     }else{//nonempty list
@@ -218,6 +225,7 @@ void insert(MAPpointer *maps,MAPpointer compare ){
 }
 
 int** check_submaps(MAPpointer print,int num){
+    // return a relationship matrix showing if the map is a submap of the others maps
     int **is_submap;
     int numcheck=0, numget=0;
     MAPpointer get, check;
@@ -238,18 +246,6 @@ int** check_submaps(MAPpointer print,int num){
             get->region[3] <= check->region[3] &&
             get->compare < check->compare ? 1:0;
 
-  /* DEBUG SECTION
-            printf("\nget: ");
-            for (size_t i = 0; i < 4; i++) {
-                printf("%f, ", get->region[i]);
-            }
-            printf("\ncheck: ");
-            for (size_t i = 0; i < 4; i++) {
-                printf("%f, ", check->region[i]);
-            }
-            printf("(%d, %d) %d\n",numget,numcheck,is_submap[numget][numcheck]);
-  */
-
             numcheck++;
         }
         numget++;
@@ -259,6 +255,7 @@ int** check_submaps(MAPpointer print,int num){
 }
 
 void printlist(MAPpointer print, int **submaps, int num) {
+    // print the sorted results
     size_t index=0;
     int name_len;
     while (print) {
@@ -278,8 +275,6 @@ void printlist(MAPpointer print, int **submaps, int num) {
             if (*(*(submaps+index)+i) == 1) {
                 printf(".%d ",i+1);
             }
-            //printf("%d  ", *(*(submaps+index)+i));
-            //printf("(%d,%d) ", index,i); DEBUG
         }
         printf("\n");
         print = print->NEXT;
@@ -287,40 +282,3 @@ void printlist(MAPpointer print, int **submaps, int num) {
     }
     printf("--------------------------------------------------------------------------------------------------------\n\n");
 }
-//seperator
-/*
-void str2xyz(FILE *infile, double *outarr) {
-    static int sep[3]={0,0,0};
-    char *numst;
-    int len = 0, loc;
-    long floc;//file location
-    char instr[BUFFER];
-
-    floc = ftell(infile);
-    fgets(instr,BUFFER,infile);
-    if (outarr) {
-        //scan file
-        for (int i = 0; i < 3; i++) {
-            *(outarr+i) = atof(instr+sep[i]);
-        }
-    }else{
-        //check separator
-        while (instr[len] != '\0') {
-            if ((instr[len] >= '0' && instr[len] <= '9') || instr[len] == '.' || instr[len] == '-' || instr[len] == '+') {
-                instr[len]='t';
-            }else{
-                instr[len]='f';
-            }
-            len++;
-        }
-        printf("%s\n", instr);
-        numst = strchr(instr,'t');
-        sep[0] = len - strlen(numst);
-        for (int j = 1; j < 3; j++) {
-            numst = strstr(numst+2,"tf");
-            sep[j] = len - strlen(numst) + 2;
-        }
-        fseek(infile,floc,SEEK_SET);
-    }
-}
-*/
