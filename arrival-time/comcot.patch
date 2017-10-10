@@ -1,0 +1,34 @@
+--- ./comcot.f90
++++ ./comcot.f90
+@@ -362,6 +362,9 @@
+ 
+ !.......UPDATE VARIABLES OF LAYER 01 (LO) FOR NEXT TIME STEP
+          CALL CHANGE(LO)
++!.......PROCESS ARRIVAL TIME DATA, ADDED BY TAO CHIU 2017
++        CALL ARRIVAL_MAIN(LO,LA,TIME,NUM_GRID)
++
+ !.......OUTPUT TIME SEQUENCE AND TIME HISTORY RECORDS AT T = K*LO%DT
+          WRITE (999,*) TIME
+ 		 IF (OUT_OPT.EQ.1 .OR. OUT_OPT.EQ.2) THEN
+@@ -480,6 +483,7 @@
+ 	  
+       IF ( L%LAYSWITCH.EQ.0 ) THEN
+ 		ALLOCATE(L%Z(L%NX,L%NY,2))
++        ALLOCATE(L%ARRIVAL_TIME_MATRIX(L%NX,L%NY,2)) !ADDED by TAO CHIU for generation of arrival time
+ 		ALLOCATE(L%M(L%NX,L%NY,2))
+ 		ALLOCATE(L%N(L%NX,L%NY,2))
+ 		ALLOCATE(L%H(L%NX,L%NY))
+@@ -543,6 +547,7 @@
+ !*		ENDIF
+ 
+ 		L%Z = 0.0
++        L%ARRIVAL_TIME_MATRIX = 0.0 !ADDED by TAO CHIU for generation of arrival time
+ 		L%M = 0.0
+ 		L%N = 0.0
+ 		L%H = 0.0
+@@ -843,5 +848,3 @@
+ 
+ 	  RETURN
+ 	  END
+-
+-

@@ -1,0 +1,37 @@
+--- ./output.f90
++++ ./output.f90
+@@ -1039,6 +1039,14 @@
+ 		    WRITE (25,'(15F9.4)') (TMP(I,J),I=1,LO%NX)
+          ENDDO
+ 		 
++         WRITE (FNAME1,29) LO%ID,K
++ 29      FORMAT('arrival_layer',I2.2,'_',I4.4,'hrs.dat')
++         IF (TIME.GE.TEND-2.0*LO%DT) FNAME1 = 'arrival_layer01.dat'
++         OPEN (25,FILE=FNAME1,STATUS='UNKNOWN')
++         DO J = 1,LO%NY
++           WRITE (25,'(15F10.2)') (LO%ARRIVAL_TIME_MATRIX(I,J,1),I=1,LO%NX)
++         ENDDO
++
+ 		 
+ 		 WRITE (FNAME7,7) LO%ID,K
+  7       FORMAT('mmax_layer',I2.2,'_',I4.4,'hrs.dat')
+@@ -1227,6 +1235,19 @@
+              	  WRITE (25,'(15F9.4)') (TMP(I,J),I=2,LA(KK)%NX)
+                ENDDO
+ 			   
++               IF (TIME.GE.TEND-2.0*LO%DT) THEN
++                  WRITE (FNAME3,30) LA(KK)%ID
++ 30               FORMAT('arrival_layer',I2.2,'.dat')
++			   ELSE
++                  WRITE (FNAME3,31) LA(KK)%ID,K
++ 31               FORMAT('arrival_layer',I2.2,'_',I4.4,'hrs.dat')
++               ENDIF
++               OPEN (25,FILE=FNAME3,STATUS='UNKNOWN')
++               DO J = 2,LA(KK)%NY
++             	  WRITE (25,'(15F10.2)') (LA(KK)%ARRIVAL_TIME_MATRIX(I,J,1),I=2,LA(KK)%NX)
++               ENDDO
++
++
+ 			   
+ 			   IF (TIME.GE.TEND-2.0*LO%DT) THEN                             !CJ
+                   WRITE (FNAME14,15) LA(KK)%ID

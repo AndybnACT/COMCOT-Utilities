@@ -1,0 +1,51 @@
+##############################################################
+# Makefile: Cornell Multigrid Coupled Tsunami (COMCOT) Model #
+# LAST REVISED: TAO CHIU 10/10/2017                          #
+##############################################################
+## LINUX VERSION ##
+F90         =  ifort
+OBJ         =  comcot
+SRC         =  	comcot.f90\
+		initialization.f90\
+ 		output.f90\
+ 		deform.f90\
+ 		mass.f90\
+ 		moment.f90\
+ 		boundaries.f90\
+ 		all_grids.f90\
+ 		hotstart.f90\
+ 		landslide.f90\
+ 		wavemaker.f90\
+ 		dispersion.f90\
+ 		arrivaltime.f90
+MODULE_SRC  =  type_module.f90
+MODULES     =  fault_params.mod landslide_params.mod layer_params.mod wave_params.mod bci_params.mod type_module.o
+RM          =  rm
+
+# ----- double precision
+# openmp
+OPT         =  -O2  -autodouble -openmp -openmp-report1
+
+
+$(OBJ):  $(SRC)
+	$(F90) -c $(OPT) $(MODULE_SRC)
+	$(F90) $(SRC) $(OPT) -o $(OBJ)
+	chmod +x $(OBJ)
+
+CLEAN_DATA:
+	for file in *.[dt][ax]t ; do\
+		if [[ "$$file" = z_[0-9][0-9]_*.dat ]] ||\
+		   [[ "$$file" = arrival_*.dat ]] ||\
+		   [[ "$$file" = M1Layer*.txt ]] ||\
+		   [[ "$$file" = [fhijmnvz]max_layer*.dat ]] ||\
+		   [[ "$$file" = layer*.dat ]] ||\
+		   [[ "$$file" = ts_record*.dat ]] ||\
+		   [[ "$$file" = zmin_layer*.dat ]] ||\
+		   [[ "$$file" = deform_seg[0-9][0-9][0-9].dat ]] ||\
+		   [[ "$$file" = *_[0-9][0-9]_*.dat ]]; then\
+                	$(RM) "$$file" ;\
+        	fi;\
+	done
+CLEAN:
+	$(RM) $(OBJ)
+	$(RM) $(MODULES)
