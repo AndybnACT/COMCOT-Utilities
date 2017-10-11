@@ -22,10 +22,13 @@ backup_files comcot.f90
 backup_files type_module.f90
 backup_files output.f90
 
+
 echo "Ready, patching files"
 patch < comcot.patch
 patch < type_mod.patch
 patch < output.patch
+#mv Makefile Makefile.bak
+#mv Makefile.new Makefile
 
 echo "Success, please append 'arrivaltime.f90' to the compiling list in your Makefile"
 echo ", or directly use the Makefile provided here if you're using 'ifort'."
